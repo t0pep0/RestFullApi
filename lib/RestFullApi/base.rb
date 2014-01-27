@@ -1,7 +1,9 @@
 class RestFullApi::Base
-  
-  def get_params
-    RestFullApi::Request.new @api_attr_readable, @api_embed_readable
+    
+  def get_params(api_attr, api_embed)
+   options = RestFullApi::Request.new(api_attr, api_embed)
+   @options = options.options
+   Rails.logger.debug "#{@options.to_s}"
   end
 
   def send_answer
@@ -9,7 +11,6 @@ class RestFullApi::Base
   end
 
   def prepare_hash model
-    hash = {}
     if @options[:search].present?
       @count = model.search(@options[:search], order: @options[:sort], conditions: @options[:filter]).count
       results = model.search(@options[:search], order: @options[:sort], conditions: @options[:filter],
@@ -23,6 +24,8 @@ class RestFullApi::Base
       record = []
       if @options[:fields].present?
         record.push get_column(res, @options[:fields])
+      else
+        record.push get_column(res, get_api_attr_readable(res))
       end
       if @options[:embed].present?
         @options[:embed].each do |embed|

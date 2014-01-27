@@ -1,7 +1,9 @@
 class RestFullApi::Request
   
   def initialize(api_attr, api_embed)
+    Rails.logger.debug "Loadded Request"
     hash = {}
+    debugger
     ##Get params
     if defined? params
       ##Get and validate fields
@@ -13,6 +15,7 @@ class RestFullApi::Request
           end
         end
       end
+      debugger
       ##Get major version
       hash[:major] = (params[:major].to_i rescue 0)
       ##Get search string
@@ -24,6 +27,7 @@ class RestFullApi::Request
       ##Get limit options
       hash[:limit] = (params[:limit].to_i rescue 0)
       ##Get and validate params for embed table
+      debugger
       if params[:embed].present?
         hash[:embed] = []
         params[:embed].split(',').each do |embed|
@@ -33,6 +37,7 @@ class RestFullApi::Request
           end
         end
       end
+      debugger
       ##Get and validate options for sort
       if params[:sort].present?
         hash[:sort] = []
@@ -41,6 +46,7 @@ class RestFullApi::Request
           hash[:sort].push("#{sort} DESC") if api_attr["-#{sort}"].present?
         end
       end
+      debugger
       ##Get and validate filter options
       hash[:filter] = []
       api_attr.each do |attr|
@@ -53,6 +59,7 @@ class RestFullApi::Request
             end
         end
       end
+      debugger
 
     end
     ##GET Headers
@@ -64,7 +71,12 @@ class RestFullApi::Request
         hash[:minor] = request.headers['X-Api-Version']
       end
     end
-    return hash
+    Rails.logger.debug "Params loaded"
+    @params = hash
+  end
+
+  def params 
+    @params
   end
 
 end

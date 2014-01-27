@@ -1,6 +1,6 @@
-class RestFullApi::Api
+class RestFullApi::Api < ActionController::Base
 
-  def initialize object
+  def apinize object
     if defined? object
       detect_type object
     else
@@ -8,10 +8,13 @@ class RestFullApi::Api
     end
     case @type
     when :model then
+        Rails.logger.debug "Load model: #{object.class.to_s}\n"
         RestFullApi::Model.new object
     when :embed then
+        Rails.logger.debug "Load embed: #{object.to_s}\n"
         RestFullApi::Embed.new object
     when :record then
+        Rails.logger.debug "Load record: #{object.to_s}\n"
         RestFullApi::Record.new object
     else
         :unknown_object

@@ -1,10 +1,10 @@
-class RestFullApi::Embed
+class RestFullApi::Embed < RestFullApi::Base
 
   def initialize embed
     @embed = embed
     @api_attr_readable = embed.api_attr_readable
     @epi_embed_readable = embed.api_embed_readable
-    @options = get_params
+    get_params @api_attr_readable, @api_embed_readable
     prepare_hash @embed
     send_answer
   end
