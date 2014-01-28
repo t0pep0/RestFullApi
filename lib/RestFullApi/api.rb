@@ -53,17 +53,19 @@ class ActionController::Api < ActionController::Base
     end
 
     if defined? params
-
+      @api_fields = []
       if ((params[:fields].present?) rescue false)
-        @api_fields = []
         params[:fields].split(',').each do |field|
           if (@api_attr_readable[field].present rescue false)
             @api_fields.push field.to_s
           end
         end
-      else
+      end
+
+      if @api_fields.empty?
         @api_fields = @api_attr_readable
       end
+
 
       @api_version_major = (params[:major].to_i rescue 0) if (params[:major].present? rescue false)
 
@@ -73,7 +75,8 @@ class ActionController::Api < ActionController::Base
 
       @api_offset = (params[:offest].to_i rescue 0)
 
-      @api_limit = (params[:limit].to_s rescue 10)
+      @api_limit = (params[:limit].to_i rescue 10)
+      @api_limit = 10 if @api_limit == 0
 
       if (params[:embed].present? rescue false)
         @api_embed = []
@@ -94,11 +97,14 @@ class ActionController::Api < ActionController::Base
           @api_sort.merge!({sort => :desc}) if (@api_attr_readable["-#{sort}"].present? rescue false)
         end
       end
+      if @api_sort.empty?
+        @api_sort = {id: :desc}
+      end
 
       operators = {'<' => :lt, '>' => :gt, '>=' => :gte, '<=' => :lte, '<>' => :not}
       @api_where_search = {}
       @api_where_raw = []
-      api_attr.readable.each do |attr|
+      @api_attr_readable.each do |attr|
         if (params[attr].present? rescue false)
           complete = false
           operators.each do |string, ident|
@@ -115,7 +121,11 @@ class ActionController::Api < ActionController::Base
           end
         end
       end
-      @api_where_raw = @api_where_raw.join(',') if (@api_where_raw.present? rescue false)
+      if (@api_where_raw.present? rescue false)
+        @api_where_raw = @api_where_raw.join(',')
+      else
+        @api_where_raw = ''
+      end
 
     else
       raise RestFullApi::NonParamsException.new
@@ -124,6 +134,7 @@ class ActionController::Api < ActionController::Base
 
 
   def read_model(model)
+    debugger
     if (@api_search_query.present? rescue false)
         models = (model.search(@api_search_query, order: @api_sort, conditions: @api_where_search, limit: @api_limit, offset: @api_offset) rescue [])
         @count = (model.search(@api_search_query, conditions: @api_where_search))
@@ -136,8 +147,9 @@ class ActionController::Api < ActionController::Base
       record = []
       if (@api_fields.present? rescue false)
         record.push get_column(res, @api_fields)
+        debugger
       else
-        record.push get_column(res, get_api_attr_readable(res))
+        record.push get_column(res, @api_attr_readable)
       end
       if (@api_embed.present? rescue false)
         @api_embed.each do |embed|
@@ -163,48 +175,52 @@ class ActionController::Api < ActionController::Base
     end
   end
 
-  def get_column object, *columns
+  def get_column object, columns
     values_type = [String, Symbol]
-    columns.each do |column|
-      case column
-      when *values_type
-        {column => object.send(column)}
-      when Hash
+    result = []
+    columns.each do |col|
+      case col
+      when *values_type then
+        result.push({col => object.send(col.to_s)})
+      when Hash then
         hash = {}
-        column.each do |key, value|
+        col.each do |key, value|
           hash[key] = object.send(value)
         end
-        hash
-      when Array
-        get_column object, column
+        result.push(hash)
+      when Array then
+        result.push(get_column(object, col))
       else
-        return :unknown_column_type
+        false # raise RestFullApi::FantasticException.new
       end
     end
+    return result
   end
   
-  def get_embed object, *embeds
+  def get_embed object, embeds
+    result = []
     if embeds.present?
       if embeds.instance_of? Array
         embeds.each do |embed|
           if embed.instance_of? Array
             if embed.length > 1
               if get_embed_attr_readable(object).include?(embed[0])
-                { embed[0] => get_embed(object.send(embed.shift), embed) }
+               resutl.push({ embed[0] => get_embed(object.send(embed.shift.to_s), embed) })
               end
             else
-              if get_embed_attr_readable(object).include?(embed)
-                { embed[0] => object.send(embed[0]) }
+              if get_embed_attr_readable(object).include?(embed.to_s)
+               result.push({ embed[0] => object.send(embed[0]) })
               end
             end
           else
-            {embed => object.send(embed)}
+            result.push({embed => object.send(embed.to_s)})
           end
         end
       else
-        {embeds => object.send(embeds)}
+        result.push({embeds => object.send(embeds.to_s)})
       end
     end
+    return result
   end
 
 
