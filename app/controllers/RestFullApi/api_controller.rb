@@ -1,3 +1,3 @@
-class RestFullApi::ApiController < ActionController::Api
+class RestFullApi::ApiController < RestFullApi::Api 
 
 end

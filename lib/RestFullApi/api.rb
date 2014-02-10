@@ -1,4 +1,4 @@
-class ActionController::Api < ActionController::Base
+class RestFullApi::Api < ActionController::Base
 
   def index
     read_params
