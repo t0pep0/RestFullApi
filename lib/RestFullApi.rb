@@ -1,14 +1,10 @@
 require "RestFullApi/version"
-require "RestFullApi/active_record_path"
+require "RestFullApi/mongoid_restfullapi"
+require "generators/config_generator"
 require "RestFullApi/api"
+require "RestFullApi/configuration"
 
 module RestFullApi
-  class UnkonwnObjectException < Exception;  end
-  class NoObjectException < Exception; end
-  class AuthorizationException < Exception; end
-  class NonParamsException < Exception; end
-  class NonHeadersException < Exception; end
-  class NonRequestException < Exception; end
-  class FantasticException < Exception; end
+  class Engine < Rails::Engine; end
   # Your code goes here...
 end

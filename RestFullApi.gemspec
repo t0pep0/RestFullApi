@@ -26,6 +26,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-core"
   spec.add_development_dependency "rr"
   spec.add_dependency "rails"
-  spec.add_dependency "activerecord"
-  spec.add_dependency "searchkick"
 end
