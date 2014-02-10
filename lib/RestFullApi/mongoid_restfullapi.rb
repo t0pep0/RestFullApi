@@ -1,4 +1,5 @@
 module Mongoid
+  module Criteria; end
   module RestFullApi
     
     def self.included(base)
