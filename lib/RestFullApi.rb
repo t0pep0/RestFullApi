@@ -1,5 +1,5 @@
 require "RestFullApi/version"
-require "RestFullApi/mongoid_restfullapi"
+require "RestFullApi/hooks"
 require "generators/config_generator"
 require "RestFullApi/api"
 require "RestFullApi/configuration"
