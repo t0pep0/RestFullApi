@@ -1,6 +1,4 @@
 module Mongoid
-  module Criteria; end
-  module Document; end
   module RestFullApi
     
     def self.included(base)
