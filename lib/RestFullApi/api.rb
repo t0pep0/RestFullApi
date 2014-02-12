@@ -66,7 +66,7 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def description
-    @answer = RestFullApi.configuration.version_option[@major][@minor][:options][:model_description][@model.model_name.to_sym]
+    @answer = RestFullApi.configuration.version_option[@major][@minor][:options][:model_description][@model.model_name.to_s.to_sym]
     render_answer(@answer, 200)
   end
 
@@ -180,12 +180,12 @@ class RestFullApi::Api < ActionController::Base
     @model = nil
     if defined? params[:model].singularize.classify.constantize
       model = params[:model].singularize.classify.constantize
-      if defined? model.model_name
-        if  model.model_name  == params[:model].singularize.classify
+      if defined? model.model_name.to_s
+        if  model.model_name.to_s  == params[:model].singularize.classify
           @model = model
-          @api_attr_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][@model.model_name.to_sym]
-          @api_embed_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_sym]
-          @api_description = RestFullApi.configuration.version_option[@major][@minor][:options][:model_description][@model.model_name.to_sym]
+          @api_attr_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][@model.model_name.to_s.to_sym]
+          @api_embed_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym]
+          @api_description = RestFullApi.configuration.version_option[@major][@minor][:options][:model_description][@model.model_name.to_s.to_sym]
         else
           create_error(:model_not_found) if params[:id].present?
         end
@@ -267,8 +267,8 @@ class RestFullApi::Api < ActionController::Base
   #get record from model 
   def get_record(record, fields, embeds)
     result = {}
-    record_attr = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][record.class.model_name.to_sym]
-    record_embed = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][record.class.model_name.to_sym]
+    record_attr = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][record.class.model_name.to_s.to_sym]
+    record_embed = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][record.class.model_name.to_s.to_sym]
     fields.each do |field|
       if record_attr.include? field.to_sym
         result[field] = (record.send(field) rescue nil)
@@ -279,7 +279,7 @@ class RestFullApi::Api < ActionController::Base
         result[embed] = []
         embed_obj = record.send(embed)
         embed_model = embed.singularize.classify.constantize
-	embed_obj_attr = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][embed_model.model_name.to_sym]
+	embed_obj_attr = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][embed_model.model_name.to_s.to_sym]
 
         subembed = embed_obj_attr unless subembed.present?
 
