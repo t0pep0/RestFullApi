@@ -104,6 +104,7 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def before
+    Rails.logger.debug request.body.read.to_s
     read_major
     read_minor
     unless (RestFullApi.configuration.version_map[@major].include?(@minor) rescue false)
