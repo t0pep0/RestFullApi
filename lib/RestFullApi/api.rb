@@ -21,50 +21,43 @@ class RestFullApi::Api < ActionController::Base
     @answer = get_record(record, @requested_fields, @requested_embed)
     @total_count = 1
     response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:created_at]] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:create_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z")
-    response.headers["Last-Modified"] = record.send(REstFullApi.configuration.version_option[@major][@minor][:options][:update_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z") 
+    response.headers["Last-Modified"] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:update_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z") 
     render_answer(@answer, 200)
-  end
-
-  def new
-    @answer = get_record(@model.new, @api_attr_accessible, {})
-    @total_count = 0
-    render_answer(@answer, 200)
-  end
-
-  def edit
-    show
   end
 
   def update
     record = @model.find_by_id(params[:id])
     @total_count = 1
     response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:created_at]] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:create_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z")
-    response.headers["Last-Modified"] = record.send(REstFullApi.configuration.version_option[@major][@minor][:options][:update_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z") 
-    record.update_attributes(params[@model.model_name.down_case])
-    render_answer(record, 200)
+    response.headers["Last-Modified"] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:update_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z") 
+    if record.update_attributes(params[@model.model_name.down_case])
+      render_answer(get_record(record, @requested_fields, @requested_embed), 200)
+    else
+      create_error(:not_updated)
+    end
   end
 
   def create
     record = @model.new(params[@model.model_name.down_case])
     @total_count = 1
-    record.save
-    response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:created_at]] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:create_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z")
-    response.headers["Last-Modified"] = record.send(REstFullApi.configuration.version_option[@major][@minor][:options][:update_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z") 
-    response.headers["Location"] = "api/#{major}/#{params[:model]}/#{record.id}"
-    @answer = {location:"/api/#{@major}/#{params[:model]}/#{record.id}"}
-    render_answer(@answer,303)
+    if record.save
+      render_answer(get_record(record, @requested_fields, @requested_embed),201)
+    else
+      create_error(:not_created)
+    end
   end
 
   def destroy
     record = @model.find_by_id(params[:id])
-    record.destroy
-    @total_count = 0
-    @answer = {status: 'destroyed'}
-    render_answer(@answer, 410)
+    if record.destroy
+      @answer = {status: 'destroyed'}
+      render_answer(@answer, 204)
+    else
+      create_error(:not_destroyed)
+    end
   end
 
   def description
-    @total_count = 0
     @answer = RestFullApi.configuration.version_option[@major][@minor][:options][:model_description][@model.model_name.to_sym]
     render_answer(@answer, 200)
   end
@@ -105,9 +98,8 @@ class RestFullApi::Api < ActionController::Base
     end
     response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:limit]] = @requested_limit.to_s if @requested_limit.present?
     response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:offset]] = @requested_offset.to_s if @requested_offset.present?
-    response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:count]] = @total_count.to_s
+    response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:count]] = @total_count.present? ? @total_count.to_s : '0'
     response.headers["Content-Type"] = "application/json"
-    response.headers["Content-Length"] = @answer.length.to_s
     render json: @answer, status: code
   end
 
@@ -140,7 +132,7 @@ class RestFullApi::Api < ActionController::Base
   def read_minor
     if defined? request
       if defined? request.headers
-        @minor = (request.headers[RestFullApi.configuration.default[:headers][:minor_version]].to_i rescue RestFullApi.configuration.default[:values][:minor_version])
+	@minor = (request.headers[RestFullApi.configuration.default[:headers][:minor_version]].present? ? request.headers[RestFullApi.configuration.default[:headers][:minor_version]].to_i : RestFullApi.configuration.default[:values][:minor_version] rescue RestFullApi.configuration.default[:values][:minor_version])
       else
         create_error(:no_headers) #IMPOSIBLE!
       end
