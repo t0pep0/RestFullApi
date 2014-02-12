@@ -71,6 +71,12 @@ module RestFullApi
       @default[:error][:invalid_api_key][:msg] = "Invalid API key"
       @default[:error][:invalid_api_key][:code] = 202
       @default[:error][:invalid_api_key][:http_code] = 401
+
+      @default[:error][:not_updated] = {}
+
+      @default[:error][:not_created] = {}
+
+      @default[:error][:not_destroyed] = {}
       
       #Headers
       @default[:headers][:minor_version] = 'X-Api-Minor-Version'
