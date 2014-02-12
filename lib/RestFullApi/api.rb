@@ -28,12 +28,16 @@ class RestFullApi::Api < ActionController::Base
   def update
     record = @model.find_by_id(params[:id])
     @total_count = 1
-    response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:created_at]] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:create_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z")
-    response.headers["Last-Modified"] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:update_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z") 
-    if (record.update_attributes(JSON.parse(request.body.read)) rescue false)
-      render_answer(get_record(record, @requested_fields, @requested_embed), 200)
+    if record.present?
+      response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:created_at]] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:create_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z")
+      response.headers["Last-Modified"] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:update_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z") 
+      if (record.update_attributes(JSON.parse(request.body.read)) rescue false)
+	render_answer(get_record(record, @requested_fields, @requested_embed), 200)
+      else
+	create_error(:not_updated)
+      end
     else
-      create_error(:not_updated)
+      create_error(:record_not_found)
     end
   end
 
@@ -49,11 +53,15 @@ class RestFullApi::Api < ActionController::Base
 
   def destroy
     record = @model.find_by_id(params[:id])
-    if record.destroy
-      @answer = {status: 'destroyed'}
-      render_answer(@answer, 204)
+    if record.present?
+      if record.destroy
+	@answer = {status: 'destroyed'}
+	render_answer(@answer, 204)
+      else
+	create_error(:not_destroyed)
+      end
     else
-      create_error(:not_destroyed)
+      create_error(:record_not_found)
     end
   end
 
