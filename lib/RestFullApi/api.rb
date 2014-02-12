@@ -30,7 +30,7 @@ class RestFullApi::Api < ActionController::Base
     @total_count = 1
     response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:created_at]] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:create_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z")
     response.headers["Last-Modified"] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:update_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z") 
-    if (record.update_attributes(params[@model.model_name.to_s.downcase]) rescue false)
+    if (record.update_attributes(JSON.parse(request.body.read)) rescue false)
       render_answer(get_record(record, @requested_fields, @requested_embed), 200)
     else
       create_error(:not_updated)
@@ -38,7 +38,7 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def create
-    record = @model.new(params[@model.model_name.to_s.downcase]) rescue create_error(:not_created)
+    record = @model.new(JSON.parse(request.body.read)) rescue create_error(:not_created)
     @total_count = 1
     if record.save
       render_answer(get_record(record, @requested_fields, @requested_embed),201)
@@ -104,7 +104,6 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def before
-    Rails.logger.debug request.body.read.to_s
     read_major
     read_minor
     unless (RestFullApi.configuration.version_map[@major].include?(@minor) rescue false)
