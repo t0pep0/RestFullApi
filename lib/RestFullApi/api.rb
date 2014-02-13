@@ -7,7 +7,7 @@ class RestFullApi::Api < ActionController::Base
       search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
     else
       @total_count = (@model.where(@requested_where).count rescue @model.where(@requested_mongo_where))
-      @records = (@model.where(@requested_where).order(@requested_sort).offset(@requested_offset).limit(@requested_limit) rescue @model.where(@requested_mongo_where).order(@requeset_sort).offset(@requested_offset).limit(@requested_limit) )
+      @records = (@model.where(@requested_where).order(@requested_sort).offset(@requested_offset).limit(@requested_limit).to_a rescue @model.where(@requested_mongo_where).order(@requeset_sort).offset(@requested_offset).limit(@requested_limit).to_a )
     end
     @records.each do |record|
       @answer.push get_record(record, @requested_fields, @requested_embed)
