@@ -281,8 +281,8 @@ class RestFullApi::Api < ActionController::Base
       if record_embed.include? embed.to_sym
         result[embed] = []
         embed_obj = record.send(embed)
-        embed_model = embed.singularize.classify.constantize
-	embed_obj_attr = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][embed_model.model_name.to_s.to_sym]
+	embed_model = (embed_obj[0].model_name.to_s rescue '')
+	embed_obj_attr = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][embed_model.to_sym]
 
         subembed = embed_obj_attr unless subembed.present?
 
