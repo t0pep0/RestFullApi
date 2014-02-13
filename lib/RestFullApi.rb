@@ -6,6 +6,6 @@ require "RestFullApi/configuration"
 
 module RestFullApi
   class Engine < Rails::Engine; end
-  RestFullApi.Hooks.init()
+  RestFullApi::Hooks.init()
   # Your code goes here...
 end
