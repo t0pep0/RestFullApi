@@ -4,7 +4,7 @@ module RestFullApi
     def self.init
       begin; require 'mongoid'; rescue false; end
       if defined? ::Mongoid
-	require 'mongoid_restfullapi'
+	require 'RestFullApi/mongoid_restfullapi'
       end
     end
 
