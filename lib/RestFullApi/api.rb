@@ -6,8 +6,8 @@ class RestFullApi::Api < ActionController::Base
     if @search_query.present?
       search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
     else
-      @total_count = @model.where(@requested_where).count
-      @records = @model.where(@requested_where).order(@requested_sort).offset(@requested_offset).limit(@requested_limit)
+      @total_count = (@model.where(@requested_where).count rescue @model.where(@requested_mongo_where))
+      @records = (@model.where(@requested_where).order(@requested_sort).offset(@requested_offset).limit(@requested_limit) rescue @model.where(@requested_mongo_where).order(@requeset_sort).offset(@requested_offset).limit(@requested_limit) )
     end
     @records.each do |record|
       @answer.push get_record(record, @requested_fields, @requested_embed)
@@ -232,20 +232,23 @@ class RestFullApi::Api < ActionController::Base
     @requested_limit = (params[:limit].to_i rescue RestFullApi.configuration.version_option[@major][@minor][:values][:limit])
     @requested_limit = RestFullApi.configuration.version_option[@major][@minor][:values][:limit] if @requested_limit == 0
 
-    operators = {">=" => :gte, "<=" => :lte, "<" => :lt, ">" => :gt, "!=" => :not}
+    operators = {">=" => "gte", "<=" => "lte", "<" => "lt", ">" => "gt", "!=" => "ne"}
     @requested_where = []
+    @requested_mongo_where = {}
     @api_attr_accessible.each do |attr|
       if (params[attr].present? rescue false)
         complete = false
           operators.each do |string, ident|
             if (params[attr][string] rescue false)
               @requested_where.push("#{attr} #{string} '#{params[attr].delete(string)}'")
+	      @requested_mongo_where.merge!({"#{attr}.#{ident}".to_sym => params[attr].delete(string)})
               complete = true
             end
             break if (params[attr][string] rescue true)
           end
           unless complete
             @requested_where.push("`#{attr}` = '#{params[attr]}'")
+	    @requested_mongo_where.merge!(attr.to_sym => params[attr])
           end
       end
     end
