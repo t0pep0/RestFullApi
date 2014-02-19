@@ -76,6 +76,8 @@ class RestFullApi::Api < ActionController::Base
           @api_attr_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][@model.model_name.to_s.to_sym]
           @api_embed_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym]
       read_params
+      read_fields
+      read_embeds
       @answer = []
       if @search_query.present?
 	search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
