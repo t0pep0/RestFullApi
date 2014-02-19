@@ -71,7 +71,7 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def edge
-    if RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge])
+    if RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
       @model = @model.send(params[:edge])
       self.index
     else
