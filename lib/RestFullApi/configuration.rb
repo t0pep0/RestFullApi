@@ -77,6 +77,8 @@ module RestFullApi
       @default[:error][:not_created] = {}
 
       @default[:error][:not_destroyed] = {}
+
+      @default[:error][:not_exist_edge] = {}
       
       #Headers
       @default[:headers][:minor_version] = 'X-Api-Minor-Version'

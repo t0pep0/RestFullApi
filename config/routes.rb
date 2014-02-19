@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   get '/api/:major/:model/:id' => 'api#show'
   put '/api/:major/:model/:id' => 'api#update'
   delete '/api/:major/:model/:id' => 'api#destroy'
+  get '/api/:major/:model/:id/:edge' => 'api#edge'
 end

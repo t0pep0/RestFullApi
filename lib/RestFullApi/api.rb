@@ -70,6 +70,15 @@ class RestFullApi::Api < ActionController::Base
     render_answer(@answer, 200)
   end
 
+  def edge
+    if RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge])
+      @model = @model.send(params[:edge])
+      self.index
+    else
+      create_error(:not_exist_edge)
+    end
+  end
+
 
  before_filter :before 
 
