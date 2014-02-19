@@ -72,10 +72,10 @@ class RestFullApi::Api < ActionController::Base
 
   def edge
     if RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
-      read_params
       @model = @model.where('rubrics.id = ?', params[:id]).first.send(params[:edge]) rescue create_error(:not_exist_edge)
           @api_attr_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][@model.model_name.to_s.to_sym]
           @api_embed_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym]
+      read_params
       @answer = []
       if @search_query.present?
 	search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
@@ -281,9 +281,9 @@ class RestFullApi::Api < ActionController::Base
       if (params[:sort].present? rescue false)
         params['sort'].split(',').each do |sort|
 	  if sort['-']
-	    @requested_sort.push("#{sort.delete('-')} DESC") if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
+	    @requested_sort.push("#{@model.table_name}.#{sort.delete('-')} DESC") if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
 	  else
-	    @requested_sort.push("#{sort} ASC") if (@api_attr_accessible.include?(sort.to_sym) rescue false)
+	    @requested_sort.push("#{@model.table_name}.#{sort} ASC") if (@api_attr_accessible.include?(sort.to_sym) rescue false)
 	  end
         end
       end
@@ -319,142 +319,10 @@ class RestFullApi::Api < ActionController::Base
 	  result[embed].push(hash)
 	end
 
-        #subembed.each do |sub|
-	#  if (embed_obj_attr.include?(sub.to_sym) rescue false)
-	#    result[embed].push([sub] = (embed_obj.send(sub)) rescue nil)
-        #  end
-        #end
       end
     end
     return result
   end
 
-
-  #TODO: CLEAR
-
-  #def send_answer
-      #unless @error.present?
-        #if @result.present?
-          #@json = @result.to_json
-          #render json: @json, status: 200
-        #else
-          #render json: {error_description: 'Upon request, nothing found'}, status: 404
-        #end
-      #else
-        #render json: {error_description: @error}, status: 500
-      #end
-  #end
-
-  #def read_model(model)
-    #if (@api_search_query.present? rescue false)
-        #models = (model.search(@api_search_query, order: @api_sort_raw, conditions: @api_where_raw, limit: @api_limit, offset: @api_offset) rescue [])
-        #@count = models.total_entries
-    #else
-      #models = model.where(@api_where_raw).order(@api_sort_raw).limit(@api_limit).offset(@api_offset)
-      #@count = model.where(@api_where_raw).count
-    #end
-    #result = []
-    #models.each do |record|
-        #result.push read_record(record)
-    #end
-    #result
-  #end
-
-  #def read_record(record)
-    #result = {}
-    #@count = 1 unless @count.present?
-    #@created_at = record.created_at if (@count == 1 and detect_type(record) == :record)
-    #@updated_at = record.updated_at if (@count == 1 and detect_type(record) == :record)
-    #if (@api_fields.present? rescue false)
-      #result.merge! get_column(record, @api_fields)
-    #else
-      #result.merge! get_column(record, @api_attr_readable)
-    #end
-
-    #if (@api_embed.present? rescue false)
-      #result.merge! get_embed(record, @api_embed_readable)
-    #end
-    #result
-  #end
-
-  #def get_column object, columns
-    #values_type = [String, Symbol]
-    #result = {}
-    #columns.each do |col|
-      #case col
-      #when *values_type then
-        #result.merge!({col => object.send(col.to_s)})
-      #when Hash then
-        #hash = {}
-        #col.each do |key, value|
-          #hash[key] = object.send(value)
-        #end
-        #result.merge!(hash)
-      #when Array then
-        #result.merge!(get_column(object, col))
-      #else
-        #@error = 'Incredible error, it was not supposed to happen, but it happened ....'
-        #send_answer
-      #end
-    #end
-    #return result
-  #end
-  
-  #def get_embed object, embeds
-    #result = {}
-    
-    #if embeds.instance_of? Array
-      #unless embeds.empty?
-        #embeds.each do |embed|
-          #values_type = [String, Symbol]
-          #case embed
-          #when *values_type then
-            #record = object.send(embed)
-            #if record.instance_of? Array
-              #record_save = record
-              #record = {}
-              #record_save.each do |rec|
-              #records = []
-                #record_save[0].class.api_attr_readable.each do |attr|
-                  #records.push! ({attr => rec.send(attr)})
-                #end
-              #end
-              #record = {embed => records}
-            #end
-            #result.merge! record
-          #end
-        #end
-      #end
-    #end
-    #result
-  #end
-
-
-  #def detect_type object
-    #if defined? object.superclass
-      #if defined? object.class
-        #case object
-        #when Class then
-          #:model
-        #when Array then
-          #:embed
-        #else
-          #:unknown
-        #end
-      #else
-          #:unknown
-      #end
-    #else
-      #if defined? Object.class.superclass
-        #if object.class.superclass == ActiveRecord::Base
-          #:record
-        #else
-          #:unknown
-        #end
-      #else
-          #:unknown
-      #end
-    #end
-  #end
 
 end
