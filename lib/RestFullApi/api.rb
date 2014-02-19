@@ -73,7 +73,7 @@ class RestFullApi::Api < ActionController::Base
   def edge
     if RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
       read_params
-      @model = @model.find_by_id(params[:id]).send(params[:edge]) rescue create_error(:not_exist_edge)
+      @model = @model.where('rubrics.id = ?', params[:id]).send(params[:edge]) rescue create_error(:not_exist_edge)
       @answer = []
       if @search_query.present?
 	search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
