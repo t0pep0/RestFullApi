@@ -262,7 +262,7 @@ class RestFullApi::Api < ActionController::Base
         complete = false
           operators.each do |string, ident|
 	    complete = true if string == 'id'
-            if (params[attr][string] rescue false)
+            if (!complete AND params[attr][string] rescue false)
 	      @requested_where.push("#{@model.table_name}.#{attr} #{string} '#{params[attr].delete(string)}'")
 	      @requested_mongo_where.merge!({"#{attr}.#{ident}".to_sym => params[attr].delete(string)})
               complete = true
