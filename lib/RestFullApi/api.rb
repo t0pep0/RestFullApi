@@ -16,7 +16,7 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def show
-    record = @model.find_by_id(params[:id])
+    record = @model.find_by_id(params[:record_id])
     create_error(:record_not_found) unless record.present?
     @answer = get_record(record, @requested_fields, @requested_embed)
     @total_count = 1
@@ -26,7 +26,7 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def update
-    record = @model.find_by_id(params[:id])
+    record = @model.find_by_id(params[:record_id])
     @total_count = 1
     if record.present?
       response.headers[RestFullApi.configuration.version_option[@major][@minor][:headers][:created_at]] = record.send(RestFullApi.configuration.version_option[@major][@minor][:options][:create_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z")
@@ -52,7 +52,7 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def destroy
-    record = @model.find_by_id(params[:id])
+    record = @model.find_by_id(params[:record_id])
     if record.present?
       if record.destroy
 	@answer = {status: 'destroyed'}
@@ -72,7 +72,7 @@ class RestFullApi::Api < ActionController::Base
 
   def edge
     if RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
-      @model = @model.where('rubrics.id = ?', params[:id]).first.send(params[:edge]) rescue create_error(:not_exist_edge)
+      @model = @model.where('rubrics.id = ?', params[:record_id]).first.send(params[:edge]) rescue create_error(:not_exist_edge)
           @api_attr_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][@model.model_name.to_s.to_sym]
           @api_embed_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym]
       read_params
@@ -209,10 +209,10 @@ class RestFullApi::Api < ActionController::Base
           @api_embed_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym]
           @api_description = RestFullApi.configuration.version_option[@major][@minor][:options][:model_description][@model.model_name.to_s.to_sym]
         else
-          create_error(:model_not_found) if params[:id].present?
+          create_error(:model_not_found) if params[:record_id].present?
         end
       else
-        create_error(:model_not_found) if params[:id].present?
+        create_error(:model_not_found) if params[:record_id].present?
       end
     else
       create_error(:model_not_stated)
@@ -261,8 +261,7 @@ class RestFullApi::Api < ActionController::Base
       if (params[attr].present? rescue false)
         complete = false
           operators.each do |string, ident|
-	    complete = true if string == 'id'
-            if (!complete AND params[attr][string] rescue false)
+            if (params[attr][string] rescue false)
 	      @requested_where.push("#{@model.table_name}.#{attr} #{string} '#{params[attr].delete(string)}'")
 	      @requested_mongo_where.merge!({"#{attr}.#{ident}".to_sym => params[attr].delete(string)})
               complete = true
