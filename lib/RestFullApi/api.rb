@@ -74,6 +74,8 @@ class RestFullApi::Api < ActionController::Base
     if RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
       read_params
       @model = @model.where('rubrics.id = ?', params[:id]).first.send(params[:edge]) rescue create_error(:not_exist_edge)
+          @api_attr_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][@model.model_name.to_s.to_sym]
+          @api_embed_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym]
       @answer = []
       if @search_query.present?
 	search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
