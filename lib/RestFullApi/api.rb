@@ -73,8 +73,8 @@ class RestFullApi::Api < ActionController::Base
   def edge
     if RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
       @model = @model.where('rubrics.id = ?', params[:record_id]).first.send(params[:edge]) rescue create_error(:not_exist_edge)
-      @api_attr_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][(@model.model_name.to_s.to_sym rescue @model.first.model_name.to_s.to_sym)]
-      @api_embed_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][(@model.model_name.to_s.to_sym rescue @model.first.model_name.to_s.to_sym)]
+      @api_attr_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:attributes_accessible][params[:edge].singularize.classify.to_sym]
+      @api_embed_accessible = RestFullApi.configuration.version_option[@major][@minor][:options][:embed_accessible][params[:edge].singularize.classify.to_sym]
       read_params
       read_fields
       read_embeds
