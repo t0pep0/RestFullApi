@@ -263,9 +263,6 @@ class RestFullApi::Api < ActionController::Base
       if (params[attr].present? rescue false)
         complete = false
           operators.each do |string, ident|
-	    if string == 'nil'
-	      string = nil
-	    end
             if (params[attr][string] rescue false)
 	      @requested_where.push("#{@model.table_name}.#{attr} #{string} '#{params[attr].delete(string)}'")
 	      @requested_mongo_where.merge!({"#{attr}.#{ident}".to_sym => params[attr].delete(string)})
@@ -274,8 +271,15 @@ class RestFullApi::Api < ActionController::Base
             break if (params[attr][string] rescue true)
           end
           unless complete
-	    @requested_where.push("`#{@model.table_name}.#{attr}` = '#{params[attr]}'")
-	    @requested_mongo_where.merge!(attr.to_sym => params[attr])
+	    if params[attr] == 'nil'
+	      value = 'NULL'
+	      mongo_value = nil
+	    else
+	      value = params[attr]
+	      mongo_value = params[attr]
+	    end
+	    @requested_where.push("`#{@model.table_name}.#{attr}` = '#{value}'")
+	    @requested_mongo_where.merge!(attr.to_sym => mongo_value)
           end
       end
     end
