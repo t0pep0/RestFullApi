@@ -69,6 +69,16 @@ class RestFullApi::Api < ActionController::Base
     @answer = @version_config[:options][:model_description][@model.model_name.to_s.to_sym]
     render_answer(@answer, 200)
   end
+	
+	def run_methods
+		method = params[:method].to_sym
+		if defined? RestFullApi.Methods.send(method)
+			render_answer(RestFullApi.Methods.send(method), 200)
+		else
+			create_error(:not_exist_method)
+		end
+	end
+
 
   def edge
     if @version_config[:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
@@ -91,19 +101,8 @@ class RestFullApi::Api < ActionController::Base
       render_answer(@answer, 200) 
     else
       create_error(:not_exist_edge)
-    end
-	end
-
-	def method
-		method = params[:method].to_sym
-		if defined? RestFullApi.Methods.send(method)
-			render_answer(RestFullApi.Methods.send(method), 200)
-		else
-			create_error(:not_exist_method)
 		end
 	end
-
-
 
   def search(model, query, where, sort, offset, limit)
     #NOTICE: This function write for "thinking sphinx, if your use another search engine override it

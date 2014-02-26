@@ -3,6 +3,7 @@ require "RestFullApi/hooks"
 require "generators/config_generator"
 require "RestFullApi/api"
 require "RestFullApi/configuration"
+require "RestFullApi/methods"
 
 module RestFullApi
   class Engine < Rails::Engine; end
