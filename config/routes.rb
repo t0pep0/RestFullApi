@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+	get '/api/:major/_methods/:method' => 'api#method'
   get '/api/:major/:model/:record_id/:edge' => 'api#edge'
   get '/api/doc/:major/:model' => 'api#description'
   get '/api/:major/:model' => 'api#index'

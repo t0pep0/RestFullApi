@@ -79,6 +79,11 @@ module RestFullApi
       @default[:error][:not_destroyed] = {}
 
       @default[:error][:not_exist_edge] = {}
+
+			@default[:error][:not_exist_method] = {}
+			@default[:error][:not_exist_method][:msg] = "Method not exists!"
+			@default[:error][:not_exist_method][:code] = 209
+			@default[:error][:not_exist_method][:http_code] = 404
       
       #Headers
       @default[:headers][:minor_version] = 'X-Api-Minor-Version'
