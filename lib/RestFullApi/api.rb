@@ -43,6 +43,7 @@ class RestFullApi::Api < ActionController::Base
 
   def before
 		@default_config = RestFullApi.configuration.default
+		read_pretty
     read_major
     read_minor
 		@version_config = RestFullApi.configuration.version_option[@major][@minor]
