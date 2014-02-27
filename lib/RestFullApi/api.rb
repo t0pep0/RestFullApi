@@ -22,14 +22,14 @@ class RestFullApi::Api < ActionController::Base
   def create_error(error_name)
     @error = {error: {code: @version_config[:error][error_name][:code],
                       description: @version_config[:error][error_name][:msg]}}
-    if defined? @pretty
+    if @pretty
       @error = JSON.pretty_generate(@error)
     end
     render json: @error, status: @version_config[:error][error_name][:http_code]
   end
 
   def render_answer(answer, code)
-    if defined? @pretty
+    if @pretty
       @answer = JSON.pretty_generate(answer)
     else
       @answer = answer.to_json
@@ -49,7 +49,7 @@ class RestFullApi::Api < ActionController::Base
 		@version_config = RestFullApi.configuration.version_option[@major][@minor]
     unless (RestFullApi.configuration.version_map[@major].include?(@minor) rescue false)
       json =  {error: {code: 0, description: RestFullApi.configuration.unknown_api_version}}
-      if defined? @pretty
+      if @pretty
         json = JSON.pretty_generate(json)
       end
       render json: json, status: 400
@@ -66,7 +66,7 @@ class RestFullApi::Api < ActionController::Base
 	end
 
   def read_pretty
-	(params[:pretty] == 'true' or params[:pretty].present?) rescue false
+		@pretty = (params[:pretty] == 'true' or params[:pretty].present?) rescue false
   end
 
   def read_major
