@@ -66,7 +66,7 @@ class RestFullApi::Api < ActionController::Base
 	end
 
   def read_pretty
-    @pretty = (params[:pretty].present? rescue false)
+	(params[:pretty] == 'true' or params[:pretty].present?) rescue false
   end
 
   def read_major
