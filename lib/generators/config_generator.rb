@@ -16,7 +16,7 @@ module RestFullApi
 			end
 		end
 
-		class AuthorizeGeneratot < Rails::Generators::Base
+		class AuthorizeGenerator < Rails::Generators::Base
 			desc 'Create authorization file for RestFullApi gem'
 			source_root File.expand_path("../templates", __FILE__)
 			def create_initializer_file
