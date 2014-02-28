@@ -15,4 +15,13 @@ module RestFullApi
 				copy_file "restfullapi_methods.rb", Rails.root.join("config", "initializers", "restfullapi_methods.rb")
 			end
 		end
+
+		class AuthorizeGeneratot < Rails::Generators::Base
+			desc 'Create authorization file for RestFullApi gem'
+			source_root File.expand_path("../templates", __FILE__)
+			def create_initializer_file
+				copy_file "restfullapi_authorize.rb", Rails.root.join("config", "initializers", "restfullapi_authorize.rb")
+			end
+		end
+
 end
