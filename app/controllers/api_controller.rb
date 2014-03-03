@@ -4,7 +4,7 @@ class ApiController < RestFullApi::Api
     read_params
     @answer = []
     if @search_query.present?
-      search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
+      search(@model, @search_query, @requested_sphinx_where, @requested_sort, @requested_offset, @requested_limit)
     else
       @total_count = (@model.where(@requested_where).count rescue @model.where(@requested_mongo_where))
       @records = (@model.where(@requested_where).order(@requested_sort).offset(@requested_offset).limit(@requested_limit).to_a rescue @model.where(@requested_mongo_where).order(@requeset_sort).offset(@requested_offset).limit(@requested_limit).to_a )

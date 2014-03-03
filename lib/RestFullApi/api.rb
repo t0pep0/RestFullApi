@@ -171,6 +171,7 @@ class RestFullApi::Api < ActionController::Base
     operators = {">=" => "gte", "<=" => "lte", "<" => "lt", ">" => "gt", "!=" => "ne"}
     @requested_where = []
     @requested_mongo_where = {}
+		@requested_sphinx_where = {}
     @api_attr_accessible.each do |attr|
       if (params[attr].present? rescue false)
         complete = false
@@ -192,6 +193,7 @@ class RestFullApi::Api < ActionController::Base
 	    end
 	    @requested_where.push("`#{@model.table_name}.#{attr}` = '#{value}'")
 	    @requested_mongo_where.merge!(attr.to_sym => mongo_value)
+			@requested_sphinx_where.merge!(attr.to_sym => mongo_value)
           end
       end
     end
@@ -228,7 +230,7 @@ class RestFullApi::Api < ActionController::Base
 	embed_obj_attr = @version_config[:options][:attributes_accessible][embed_model.to_sym]
         subembed = embed_obj_attr if subembed == [nil]
 
-	if embed_obj.instance_of? Array
+	if embed_obj.class === Array
 		embed_obj.each do |obj|
 			hash = {}
 			subembed.each do |sub|
@@ -238,14 +240,14 @@ class RestFullApi::Api < ActionController::Base
 			end
 			result.merge!({embed => hash})
 		end
-	else
-		hash = {}
-		subembed.each do |sub|
-			if (embed_obj_attr.include?(sub.to_sym) rescue false)
-				hash[sub] = (embed_obj.send(sub) rescue nil)
-			end
-		end
-		result.merge!({embed => push(hash)})
+#	else
+#		hash = {}
+#		subembed.each do |sub|
+#			if (embed_obj_attr.include?(sub.to_sym) rescue false)
+#				hash[sub] = (embed_obj.send(sub) rescue nil)
+#			end
+#		end
+#		result.merge!({embed => push(hash)})
 	end
 
       end
