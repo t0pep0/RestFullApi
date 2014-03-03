@@ -240,14 +240,14 @@ class RestFullApi::Api < ActionController::Base
 			end
 			result.merge!({embed => hash})
 		end
-#	else
-#		hash = {}
-#		subembed.each do |sub|
-#			if (embed_obj_attr.include?(sub.to_sym) rescue false)
-#				hash[sub] = (embed_obj.send(sub) rescue nil)
-#			end
-#		end
-#		result.merge!({embed => push(hash)})
+	else
+		hash = {}
+		subembed.each do |sub|
+			if (embed_obj_attr.include?(sub.to_sym) rescue false)
+				hash[sub] = (embed_obj.send(sub) rescue nil)
+			end
+		end
+		result.merge!({embed => hash})
 	end
 
       end
