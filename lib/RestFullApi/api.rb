@@ -233,7 +233,7 @@ class RestFullApi::Api < ActionController::Base
 				Rails.logger.debug "#{embed_obj.class.to_s}"
 
 	unless embed_obj.class.nil?
-		if embed_obj.class === Array
+		if embed_obj.class == Array
 			embed_obj.each do |obj|
 				hash = {}
 				subembed.each do |sub|
