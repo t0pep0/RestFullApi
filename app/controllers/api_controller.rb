@@ -94,22 +94,28 @@ class ApiController < RestFullApi::Api
   def edge
     if @version_config[:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
       @model = @model.where("#{params[:model].singularize.classify.constantize.table_name}.id = ?", params[:record_id]).first.send(params[:edge]) rescue create_error(:not_exist_edge)
-      @api_attr_accessible = @version_config[:options][:attributes_accessible][params[:edge].singularize.classify.to_sym]
-      @api_embed_accessible = @version_config[:options][:embed_accessible][params[:edge].singularize.classify.to_sym]
+			@model_name = @model.class.model_name.to_sym @model.new.class.model_name.to_sym
+      @api_attr_accessible = @version_config[:options][:attributes_accessible][@model_name]
+      @api_embed_accessible = @version_config[:options][:embed_accessible][@model_name]
       read_params
       read_fields
       read_embeds
       @answer = []
-      if @search_query.present?
-				search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
-      else
-				@total_count = (@model.where(@requested_where).count.length rescue @model.where(@requested_mongo_where).count)
-				@records = (@model.where(@requested_where).order(@requested_sort).offset(@requested_offset).limit(@requested_limit).to_a rescue @model.where(@requested_mongo_where).order(@requeset_sort).offset(@requested_offset).limit(@requested_limit).to_a )
-      end
-      @records.each do |record|
-				@answer.push get_record(record, @requested_fields, @requested_embed)
-      end
-      render_answer(@answer, 200) 
+			if (@model.instance_of? Array)
+				if @search_query.present?
+					search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
+				else
+					@total_count = (@model.where(@requested_where).count.length rescue @model.where(@requested_mongo_where).count)
+					@records = (@model.where(@requested_where).order(@requested_sort).offset(@requested_offset).limit(@requested_limit).to_a rescue @model.where(@requested_mongo_where).order(@requeset_sort).offset(@requested_offset).limit(@requested_limit).to_a )
+				end
+				@records.each do |record|
+					@answer.push get_record(record, @requested_fields, @requested_embed)
+				end
+			else
+				@total_count = 1
+				@answer = get_record(@model, @requested_fields, @requested_embed)
+			end
+			render_answer(@answer, 200) 
 		else
       create_error(:not_exist_edge)
 		end
