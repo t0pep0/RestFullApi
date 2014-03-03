@@ -233,20 +233,20 @@ class RestFullApi::Api < ActionController::Base
 		embed_obj.each do |obj|
 			hash = {}
 			subembed.each do |sub|
-				if (embed_obj_attr.include?(sub.to_sym) rescue false)
+				if (embed_obj_attr.include?(sub.to_sym) rescue raise 'Fail in embed')
 					hash[sub] = (obj.send(sub) rescue nil)
 				end
 			end
-			result[embed].push(hash)
+			result.merge!({embed => hash})
 		end
 	else
 		hash = {}
 		subembed.each do |sub|
-			if (embed_obj_attr.include?(sub.to_sym) rescue false)
+			if (embed_obj_attr.include?(sub.to_sym) rescue raise 'Fail in embed')
 				hash[sub] = (embed_obj.send(sub) rescue nil)
 			end
 		end
-		result[embed].push(hash)
+		result.merge!({embed => push(hash)})
 	end
 
       end
