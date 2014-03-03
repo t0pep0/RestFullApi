@@ -226,8 +226,7 @@ class RestFullApi::Api < ActionController::Base
         embed_obj = record.send(embed)
 				embed_model = (embed_obj.instance_of?(Array) ? embed_obj.new.class.model_name.to_s : embed_obj.class.model_name.to_s)
 	embed_obj_attr = @version_config[:options][:attributes_accessible][embed_model.to_sym]
-				Rails.logger.debug "#{{:subembed => subembed}.to_s}"
-        subembed = embed_obj_attr if subembed.empty?
+        subembed = embed_obj_attr if subembed.nil?
 
 	if embed_obj.instance_of? Array
 		embed_obj.each do |obj|
