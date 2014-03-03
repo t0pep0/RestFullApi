@@ -231,7 +231,7 @@ class RestFullApi::Api < ActionController::Base
         subembed = embed_obj_attr if subembed == [nil]
 				unless (embed_obj.class.nil?)
 					if (embed_obj.class == Array)
-						unless embed_obj.length < 1
+						unless embed_obj.count == 0
 							arr = []
 							embed_obj.each do |obj|
 								hash = {}
