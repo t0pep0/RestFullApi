@@ -233,7 +233,7 @@ class RestFullApi::Api < ActionController::Base
 		embed_obj.each do |obj|
 			hash = {}
 			subembed.each do |sub|
-				if (embed_obj_attr.include?(sub.to_sym) rescue raise 'Fail in embed')
+				if (embed_obj_attr.include?(sub.to_sym) rescue raise "Not found #{sub} in #{embed_obj_attr.to_s}")
 					hash[sub] = (obj.send(sub) rescue nil)
 				end
 			end
