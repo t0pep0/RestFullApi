@@ -214,7 +214,7 @@ class RestFullApi::Api < ActionController::Base
 
   #get record from model 
   def get_record(record, fields, embeds)
-		record_class = (record.class.model_name.to_s rescue record.new.class.model_name.to_s)
+		record_class = (record.new.class.model_name.to_sym rescue record.class.model_name.to_sym)
     result = {}
     record_attr = @version_config[:options][:attributes_accessible][record_class]
     record_embed = @version_config[:options][:embed_accessible][record_class]
