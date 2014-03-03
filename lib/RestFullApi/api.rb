@@ -214,9 +214,10 @@ class RestFullApi::Api < ActionController::Base
 
   #get record from model 
   def get_record(record, fields, embeds)
+		record_class = (record.class.model_name.to_s rescue record.new.class.model_name.to_s)
     result = {}
-    record_attr = @version_config[:options][:attributes_accessible][record.class.model_name.to_s.to_sym]
-    record_embed = @version_config[:options][:embed_accessible][record.class.model_name.to_s.to_sym]
+    record_attr = @version_config[:options][:attributes_accessible][record_class]
+    record_embed = @version_config[:options][:embed_accessible][record_class]
     fields.each do |field|
       if record_attr.include? field.to_sym
         result[field] = (record.send(field) rescue nil)
