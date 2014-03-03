@@ -94,7 +94,7 @@ class ApiController < RestFullApi::Api
   def edge
     if @version_config[:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
       @model = @model.where("#{params[:model].singularize.classify.constantize.table_name}.id = ?", params[:record_id]).first.send(params[:edge]) rescue create_error(:not_exist_edge)
-			@model_name = @model.class.model_name.to_sym @model.new.class.model_name.to_sym
+			@model_name = @model.class.model_name.to_sym rescue @model.new.class.model_name.to_sym
       @api_attr_accessible = @version_config[:options][:attributes_accessible][@model_name]
       @api_embed_accessible = @version_config[:options][:embed_accessible][@model_name]
       read_params
