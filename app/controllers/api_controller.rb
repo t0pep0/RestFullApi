@@ -101,7 +101,7 @@ class ApiController < RestFullApi::Api
       read_fields
       read_embeds
       @answer = []
-			if (@model.instance_of? Array)
+			if (@model.class != @model_name.to_s)
 				if @search_query.present?
 					search(@model, @search_query, @requested_where, @requested_sort, @requested_offset, @requested_limit)
 				else
