@@ -224,7 +224,7 @@ class RestFullApi::Api < ActionController::Base
       if record_embed.include? embed.to_sym
         result[embed] = []
         embed_obj = record.send(embed)
-	embed_model = ((embed_obj.instance_of?(Array) ? embed_obj[0].model_name.to_s : embed_obj.model_name.to_s) rescue '')
+				embed_model = (embed_obj.instance_of?(Array) ? embed_obj.first.model_name.to_s : embed_obj.model_name.to_s)
 	embed_obj_attr = @version_config[:options][:attributes_accessible][embed_model.to_sym]
 
         subembed = embed_obj_attr unless subembed.present?
@@ -233,7 +233,7 @@ class RestFullApi::Api < ActionController::Base
 		embed_obj.each do |obj|
 			hash = {}
 			subembed.each do |sub|
-				if (embed_obj_attr.include?(sub.to_sym) rescue raise "Not found #{sub} in #{embed_obj_attr.to_s}")
+				if (embed_obj_attr.include?(sub.to_sym) rescue false)
 					hash[sub] = (obj.send(sub) rescue nil)
 				end
 			end
@@ -242,7 +242,7 @@ class RestFullApi::Api < ActionController::Base
 	else
 		hash = {}
 		subembed.each do |sub|
-			if (embed_obj_attr.include?(sub.to_sym) rescue raise 'Fail in embed')
+			if (embed_obj_attr.include?(sub.to_sym) rescue false)
 				hash[sub] = (embed_obj.send(sub) rescue nil)
 			end
 		end
