@@ -223,46 +223,43 @@ class RestFullApi::Api < ActionController::Base
       end
     end
     embeds.each do |embed, subembed|
-      if record_embed.include? embed.to_sym
+			if record_embed.include? embed.to_sym
         result[embed] = []
         embed_obj = record.send(embed)
 				embed_model = (embed_obj.instance_of?(Array) ? embed_obj.new.class.model_name.to_s : embed_obj.class.model_name.to_s)
 	embed_obj_attr = @version_config[:options][:attributes_accessible][embed_model.to_sym]
         subembed = embed_obj_attr if subembed == [nil]
-
-
-	unless (embed_obj.class.nil?)
-		if (embed_obj.class == Array)
-			unless embed_obj.empty?
-				arr = []
-				embed_obj.each do |obj|
-					hash = {}
-					subembed.each do |sub|
-						if (embed_obj_attr.include?(sub.to_sym) rescue false)
-							hash[sub] = (obj.send(sub) rescue nil)
+				unless (embed_obj.class.nil?)
+					if (embed_obj.class == Array)
+						unless embed_obj.empty?
+							arr = []
+							embed_obj.each do |obj|
+								hash = {}
+								subembed.each do |sub|
+									if (embed_obj_attr.include?(sub.to_sym) rescue false)
+										hash[sub] = (obj.send(sub) rescue nil)
+									end
+								end
+								arr.push(hash)
+							end
+							result.merge!({embed => arr})
+						else
+							result.merge!({embed => nil})
 						end
+					else
+						hash = {}
+						subembed.each do |sub|
+							if (embed_obj_attr.include?(sub.to_sym) rescue false)
+								hash[sub] = (embed_obj.send(sub) rescue nil)
+							end
+						end
+						result.merge!({embed => hash})
 					end
-					arr.push({embed => hash})
-				end
-				result.merge!({embed => arr})
-			else
-				result.merge!({embed => nil})
-			end
-		else
-			hash = {}
-			subembed.each do |sub|
-				if (embed_obj_attr.include?(sub.to_sym) rescue false)
-					hash[sub] = (embed_obj.send(sub) rescue nil)
+				else
+					result.merge!({embed => nil})
 				end
 			end
-			result.merge!({embed => hash})
 		end
-	else
-		result.merge!({embed => nil})
-	end
-
-      end
-    end
     return result
   end
 
