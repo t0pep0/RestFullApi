@@ -230,6 +230,8 @@ class RestFullApi::Api < ActionController::Base
 	embed_obj_attr = @version_config[:options][:attributes_accessible][embed_model.to_sym]
         subembed = embed_obj_attr if subembed == [nil]
 
+				Rails.logger.debug "#{embed_model.class.to_s}"
+
 	unless embed_obj.class.nil?
 		if embed_obj.class === Array
 			embed_obj.each do |obj|
