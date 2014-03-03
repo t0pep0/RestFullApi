@@ -230,18 +230,23 @@ class RestFullApi::Api < ActionController::Base
 	embed_obj_attr = @version_config[:options][:attributes_accessible][embed_model.to_sym]
         subembed = embed_obj_attr if subembed == [nil]
 
-				Rails.logger.debug "#{embed_obj.class.to_s}"
 
-	unless embed_obj.class.nil?
-		if embed_obj.class == Array
-			embed_obj.each do |obj|
-				hash = {}
-				subembed.each do |sub|
-					if (embed_obj_attr.include?(sub.to_sym) rescue false)
-						hash[sub] = (obj.send(sub) rescue nil)
+	unless (embed_obj.class.nil?)
+		if (embed_obj.class == Array)
+			unless embed_obj.empty?
+				arr = []
+				embed_obj.each do |obj|
+					hash = {}
+					subembed.each do |sub|
+						if (embed_obj_attr.include?(sub.to_sym) rescue false)
+							hash[sub] = (obj.send(sub) rescue nil)
+						end
 					end
+					arr.push({embed => hash})
 				end
-				result.merge!({embed => hash})
+				result.merge!({embed => arr})
+			else
+				result.merge!({embed => nil})
 			end
 		else
 			hash = {}
