@@ -229,14 +229,24 @@ class RestFullApi::Api < ActionController::Base
 
         subembed = embed_obj_attr unless subembed.present?
 
-	embed_obj.each do |obj|
-	  hash = {}
-	  subembed.each do |sub|
-	    if (embed_obj_attr.include?(sub.to_sym) rescue false)
-	      hash[sub] = (obj.send(sub) rescue nil)
-	    end
-	  end
-	  result[embed].push(hash)
+	if embed_obj.instance_of? Array
+		embed_obj.each do |obj|
+			hash = {}
+			subembed.each do |sub|
+				if (embed_obj_attr.include?(sub.to_sym) rescue false)
+					hash[sub] = (obj.send(sub) rescue nil)
+				end
+			end
+			result[embed].push(hash)
+		end
+	else
+		hash = {}
+		subembed.each do |sub|
+			if (embed_obj_attr.include?(sub.to_sym) rescue false)
+				hash[sub] = (embed_obj.send(sub) rescue nil)
+			end
+		end
+		result[embed].push(hash)
 	end
 
       end
