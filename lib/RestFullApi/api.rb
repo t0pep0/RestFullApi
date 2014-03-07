@@ -102,12 +102,12 @@ class RestFullApi::Api < ActionController::Base
   def authencticate
     if @version_config[:options][:authorize]
       authenticate_or_request_with_http_basic do |login, pass|
-        @auth = authorize?(login, pass)
-        true
+        if authorize?(login, pass)
+					return true
+				else
+					create_error(:not_authorize)
+				end
       end 
-      unless @auth
-        create_error(:not_authorize)
-      end
     end
   end
 

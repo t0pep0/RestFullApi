@@ -1,8 +1,8 @@
 class ApiController < RestFullApi::Api 
 
-  def index
-    read_params
-    @answer = []
+	def index
+		read_params
+		@answer = Array.new
     if @search_query.present?
       search(@model, @search_query, @requested_sphinx_where, @requested_sort, @requested_offset, @requested_limit)
     else
@@ -13,7 +13,7 @@ class ApiController < RestFullApi::Api
       @answer.push get_record(record, @requested_fields, @requested_embed)
     end
     render_answer(@answer, 200)
-  end
+	end
 
 
   def show
@@ -34,9 +34,9 @@ class ApiController < RestFullApi::Api
       response.headers[@version_config[:headers][:created_at]] = record.send(@version_config[:options][:create_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z")
       response.headers["Last-Modified"] = record.send(@version_config[:options][:update_timestamp]).strftime("%a, %d %b %Y %H:%M:%S %Z") 
       if (record.update_attributes(JSON.parse(request.body.read)) rescue false)
-	render_answer(get_record(record, @requested_fields, @requested_embed), 200)
+				render_answer(get_record(record, @requested_fields, @requested_embed), 200)
       else
-	create_error(:not_updated)
+				create_error(:not_updated)
       end
     else
       create_error(:record_not_found)
@@ -59,10 +59,10 @@ class ApiController < RestFullApi::Api
     record = @model.find_by_id(params[:record_id])
     if record.present?
       if record.destroy
-	@answer = {status: 'destroyed'}
-	render_answer(@answer, 204)
+				@answer = {status: 'destroyed'}
+				render_answer(@answer, 204)
       else
-	create_error(:not_destroyed)
+				create_error(:not_destroyed)
       end
     else
       create_error(:record_not_found)
@@ -71,7 +71,7 @@ class ApiController < RestFullApi::Api
 
 
   def description
-    @answer = @version_config[:options][:model_description][@model.model_name.to_s.to_sym]
+    @answer = @version_config[:options][:description]
     render_answer(@answer, 200)
   end
 	
