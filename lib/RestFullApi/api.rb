@@ -46,13 +46,14 @@ class RestFullApi::Api < ActionController::Base
 		read_pretty
     read_major
     read_minor
-		@version_config = RestFullApi.configuration.version_option[@major][@minor]
     unless (RestFullApi.configuration.version_map[@major].include?(@minor) rescue false)
       json =  {error: {code: 0, description: RestFullApi.configuration.unknown_api_version}}
       if @pretty
         json = JSON.pretty_generate(json)
       end
       render json: json, status: 400
+		else
+			@version_config = RestFullApi.configuration.version_option[@major][@minor]
     end
     read_api_key
     check_api_key
@@ -70,13 +71,13 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def read_major
-    @major = (params[:major].to_i rescue @default_config[:values][:major_version])
+		@major = (params[:major].to_i rescue @default_config[:values][:major_version].to_i)
   end
 
   def read_minor
     if defined? request
       if defined? request.headers
-	@minor = (request.headers[@default_config[:headers][:minor_version]].present? ? request.headers[@default_config[:headers][:minor_version]].to_i : @default_config[:values][:minor_version] rescue @default_config[:values][:minor_version])
+				@minor = (request.headers[@default_config[:headers][:minor_version]].present? ? request.headers[@default_config[:headers][:minor_version]].to_i : @default_config[:values][:minor_version].to_i rescue @default_config[:values][:minor_version].to_i)
       else
         create_error(:no_headers) #IMPOSIBLE!
       end
