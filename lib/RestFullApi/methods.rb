@@ -1,4 +1,2 @@
-module RestFullApi::Methods	
-	class self < RestFullApi::Api 
-	end;
+class RestFullApi::Methods < RestFullApi::Api
 end
