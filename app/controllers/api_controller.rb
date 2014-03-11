@@ -1,5 +1,5 @@
 class ApiController < RestFullApi::Api 
-	extend RestFullApi::Method_Extend
+	include RestFullApi::Method_Extend
 
 	def index
 		read_params
