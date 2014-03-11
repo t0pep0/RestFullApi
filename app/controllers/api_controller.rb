@@ -76,7 +76,6 @@ class ApiController < RestFullApi::Api
   end
 	
 	def run_methods
-		RestFullApi::Methods.init(params)
 		meth = params[:method]
 		if RestFullApi::Methods.method_names.include? meth
 		  answer = RestFullApi::Methods.send(meth)
