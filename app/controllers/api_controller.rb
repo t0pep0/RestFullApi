@@ -78,10 +78,10 @@ class ApiController < RestFullApi::Api
 	def run_methods
 		methods = RestFullApi::Methods.new
 		meth = params[:method]
-		if methods.method_names.include? meth
+		if methods.respond_to? meth.to_sym
 		  answer = methods.send(meth)
 			unless answer.nil?
-				render_answer(methods.send(meth), 200)
+				render_answer(answer, 200)
 			else
 				render_answer(nil, 404)
 			end
