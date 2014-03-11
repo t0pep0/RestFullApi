@@ -1,4 +1,5 @@
 class ApiController < RestFullApi::Api 
+	extend RestFullApi::Method_Extend
 
 	def index
 		read_params
@@ -76,10 +77,9 @@ class ApiController < RestFullApi::Api
   end
 	
 	def run_methods
-		methods = RestFullApi::Methods.new
 		meth = params[:method]
-		if methods.respond_to? meth.to_sym
-		  answer = methods.send(meth)
+		if self.respond_to? meth.to_sym
+		  answer = self.send(meth)
 			unless answer.nil?
 				render_answer(answer, 200)
 			else
