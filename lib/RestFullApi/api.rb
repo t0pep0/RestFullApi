@@ -201,13 +201,16 @@ class RestFullApi::Api < ActionController::Base
         @requested_where = @requested_where.join(', ')
 
       @requested_sort = {}
+			@requested_search_sort = {}
       if (params[:sort].present? rescue false)
         params['sort'].split(',').each do |sort|
 	  if sort['-']
 			@requested_sort.merge!("#{@model.table_name}.#{sort.delete('-')}".to_sym => :desc) if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
+			@requested_search_ort.merge!(sort.delete('-').to_sym => :desc) if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
 	  else
-			@requested_sort.merge!("#{@model.table_name}.#{sort}".to_sym => :asc) if (@api_attr_accessible.include?(sort.to_sym) rescue false)
 	  end
+			@requested_sort.merge!("#{@model.table_name}.#{sort}".to_sym => :asc) if (@api_attr_accessible.include?(sort.to_sym) rescue false)
+			@requested_search_sort.merge!(sort.to_sym => :asc) if (@api_attr_accessible.include?(sort.to_sym) rescue false)
         end
       end
   end
