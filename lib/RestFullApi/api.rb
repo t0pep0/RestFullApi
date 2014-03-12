@@ -200,17 +200,16 @@ class RestFullApi::Api < ActionController::Base
     end
         @requested_where = @requested_where.join(', ')
 
-      @requested_sort = []
+      @requested_sort = {}
       if (params[:sort].present? rescue false)
         params['sort'].split(',').each do |sort|
 	  if sort['-']
-	    @requested_sort.push("#{@model.table_name}.#{sort.delete('-')} DESC") if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
+	    @requested_sort.merge!("#{@model.table_name}.#{sort.delete('-')}" => :desc) if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
 	  else
-	    @requested_sort.push("#{@model.table_name}.#{sort} ASC") if (@api_attr_accessible.include?(sort.to_sym) rescue false)
+	    @requested_sort.merge!("#{@model.table_name}.#{sort}" => :asc) if (@api_attr_accessible.include?(sort.to_sym) rescue false)
 	  end
         end
       end
-      @requested_sort = @requested_sort.join(',')
   end
 
   #get record from model 
