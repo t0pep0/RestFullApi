@@ -49,6 +49,7 @@ class ApiController < RestFullApi::Api
     record = @model.new(params[:api]) rescue create_error(:not_created)
     @total_count = 1
 			Rails.logger.debug "USER: #{User.current.to_json}"
+			Rails.logger.debug "COOKIE: #{cookie[:'_session_id']}"
     if record.save
       render_answer(get_record(record, @requested_fields, @requested_embed),201)
     else
