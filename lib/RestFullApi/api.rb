@@ -1,4 +1,4 @@
-class RestFullApi::Api < ApplicationController
+class RestFullApi::Api < ActionController::Base
 
   def search(model, query, where, sort, offset, limit)
     #NOTICE: This function write for "thinking sphinx, if your use another search engine override it
@@ -46,6 +46,7 @@ class RestFullApi::Api < ApplicationController
 		read_pretty
     read_major
     read_minor
+		User.current = current_user rescue false #Dirty hack
     unless (RestFullApi.configuration.version_map[@major].include?(@minor) rescue false)
       json =  {error: {code: 0, description: RestFullApi.configuration.unknown_api_version}}
       if @pretty
