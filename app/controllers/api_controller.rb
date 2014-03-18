@@ -48,13 +48,9 @@ class ApiController < RestFullApi::Api
   def create
     record = @model.new(params[:api]) rescue create_error(:not_created)
     @total_count = 1
-			Rails.logger.debug "USER: #{User.current.to_json}"
-			Rails.logger.debug "COOKIE: #{cookies[:'_session_id']}"
     if record.save
       render_answer(get_record(record, @requested_fields, @requested_embed),201)
     else
-			Rails.logger.debug "RECORD: #{record.to_json}"
-			Rails.logger.debug "ERRORS: #{record.errors.full_messages}"
       create_error(:not_created)
     end
   end
@@ -128,7 +124,7 @@ class ApiController < RestFullApi::Api
 	def new_edge
 		if @version_config[:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
 		 @model = @model.where("#{params[:model].singularize.classify.constantize.table_name}.id = ?", params[:record_id]).first.send(params[:edge]) rescue create_error(:not_exist_edge)
-		 res = @model.new(JSON.parse(request.body.read)) 
+		 res = @model.new(params[:api]) 
 		 if res.save
 			 @total_count = 1
 			 render_answer(res,201)
