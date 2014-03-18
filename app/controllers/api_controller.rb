@@ -46,9 +46,9 @@ class ApiController < RestFullApi::Api
 
 
   def create
-    record = @model.create(JSON.parse(request.body.read)) rescue create_error(:not_created)
+    record = @model.new(JSON.parse(request.body.read)) rescue create_error(:not_created)
     @total_count = 1
-    if record.present?
+    if record.save
       render_answer(get_record(record, @requested_fields, @requested_embed),201)
     else
       create_error(:not_created)
