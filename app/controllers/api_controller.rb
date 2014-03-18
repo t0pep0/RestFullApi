@@ -48,10 +48,12 @@ class ApiController < RestFullApi::Api
   def create
     record = @model.new(params[:api]) rescue create_error(:not_created)
     @total_count = 1
+			Rails.logger.debug "USER: #{User.current.to_json}"
     if record.save
       render_answer(get_record(record, @requested_fields, @requested_embed),201)
     else
-			Rails.logger.debug record.errors.full_messages
+			Rails.logger.debug "RECORD: #{record.to_json}"
+			Rails.logger.debug "ERRORS: #{record.errors.full_messages}
       create_error(:not_created)
     end
   end
