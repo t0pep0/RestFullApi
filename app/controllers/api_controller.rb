@@ -51,6 +51,7 @@ class ApiController < RestFullApi::Api
     if record.save
       render_answer(get_record(record, @requested_fields, @requested_embed),201)
     else
+			Rails.logger.debug record.errors.full_messages
       create_error(:not_created)
     end
   end
