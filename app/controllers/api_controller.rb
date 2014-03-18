@@ -5,7 +5,7 @@ class ApiController < RestFullApi::Api
 		read_params
 		@answer = Array.new
     if @search_query.present?
-      search(@model, @search_query, @requested_sphinx_where, @requested_search_sort, @requested_offset, @requested_limit)
+     search(@model, @search_query, @requested_sphinx_where, @requested_search_sort, @requested_offset, @requested_limit)
     else
       @total_count = (@model.where(@requested_where).count rescue @model.where(@requested_mongo_where))
       @records = (@model.where(@requested_where).order(@requested_sort).offset(@requested_offset).limit(@requested_limit).to_a rescue @model.where(@requested_mongo_where).order(@requeset_sort).offset(@requested_offset).limit(@requested_limit).to_a )
@@ -53,7 +53,7 @@ class ApiController < RestFullApi::Api
       render_answer(get_record(record, @requested_fields, @requested_embed),201)
     else
 			Rails.logger.debug "RECORD: #{record.to_json}"
-			Rails.logger.debug "ERRORS: #{record.errors.full_messages}
+			Rails.logger.debug "ERRORS: #{record.errors.full_messages}"
       create_error(:not_created)
     end
   end
