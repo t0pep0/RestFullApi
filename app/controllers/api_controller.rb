@@ -124,7 +124,8 @@ class ApiController < RestFullApi::Api
 	def new_edge
 		if @version_config[:options][:embed_accessible][@model.model_name.to_s.to_sym].include?(params[:edge].to_sym)
 		 @model = @model.where("#{params[:model].singularize.classify.constantize.table_name}.id = ?", params[:record_id]).first.send(params[:edge]) rescue create_error(:not_exist_edge)
-		 res = @model.create(JSON.parse(request.body.read)) rescue create_error(:not_created)
+		 res = @model.new(JSON.parse(request.body.read)) 
+		 create_error(:not_created) unless res.save
 		 @total_count = 1
 		 render_answer(res,201)
 		else
