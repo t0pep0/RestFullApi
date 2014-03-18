@@ -129,7 +129,7 @@ class ApiController < RestFullApi::Api
 			 @total_count = 1
 			 render_answer(res,201)
 		 else
-			 Rails.logger.debug res.errors
+			 Rails.logger.debug res.errors.full_messages
 			 create_error(:not_created)
 		 end
 		else
