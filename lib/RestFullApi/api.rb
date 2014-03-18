@@ -1,4 +1,4 @@
-class RestFullApi::Api < ActionController::Base
+class RestFullApi::Api < ApplicationController
 
   def search(model, query, where, sort, offset, limit)
     #NOTICE: This function write for "thinking sphinx, if your use another search engine override it
