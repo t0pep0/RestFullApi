@@ -2,7 +2,7 @@ class RestFullApi::Api < ActionController::Base
 
   def search(model, query, where, sort, offset, limit)
     #NOTICE: This function write for "thinking sphinx, if your use another search engine override it
-    @records = @model.search(query, conditions: where, order: sort, offset: offset, limit: limit)
+		@records = @model.search(query.split(' ').map{|i| "*#{i}*"}.join(' '), conditions: where, order: sort, offset: offset, limit: limit)
     @total_count = @records.total_entries
   end
 
