@@ -79,26 +79,26 @@ class ApiController < RestFullApi::Api
 			route = {}
 			@embed_list[model].each do |embed|
 				route[:request_type] = "GET"
-				route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{embed}"
+				route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{embed}"
 				@routes.push(route)
 				route[:request_type] = "POST"
-				route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{embed}"
+				route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{embed}"
 				@routes.push(route)
 			end
 			route[:request_type] = "GET"
-			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}"
+			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}"
 			@routes.push(route)
 			route[:request_type] = "POST"
-			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}"
+			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}"
 			@routes.push(route)
 			route[:request_type] = "GET"
-			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{model.classify.constantize.first.id}"
+			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{model.classify.constantize.first.id}"
 			@routes.push(route)
 			route[:request_type] = "PUT"
-			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{model.classify.constantize.first.id}"
+			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{model.classify.constantize.first.id}"
 			@routes.push(route)
 			route[:request_type] = "POST"
-			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{model.classify.constantize.first.id}"
+			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{model.classify.constantize.first.id}"
 			@routes.push(route)
 
 		end
