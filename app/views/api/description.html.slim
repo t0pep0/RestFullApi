@@ -38,10 +38,10 @@ table
 			tr
 				td = model
 				td
-					unless attributes.nil? 
+					- unless attributes.nil? 
 						= attributes.join('<br>')
 				td 
-					unless @embed_list[model].nil?
+					- unless @embed_list[model].nil?
 						= @embed_list[model].join('<br>')
 h3 Accessible params
 table
