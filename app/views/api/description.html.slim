@@ -1,0 +1,126 @@
+h3 
+	'Basic settings
+table
+	tr
+		td
+			'API key need
+		td = @version_config[:options][:ask_api_key].to_s
+	tr
+		td
+			'Authorize need
+		td = @version_config[:options][:authorize].to_s
+h3
+	'Errors list
+table
+	tr
+		td
+			'HTTP code
+		td
+			'Internal code
+		td
+			'Error message
+	- @version_config[:error] do |error, values|
+		tr
+			td = values[:http_code]
+			td = values[:code]
+			td = values[:msg]
+h3
+	'Model, Attributes and Embed list
+table
+	tr
+		td
+			'Model
+		td
+			'Attributes
+		td
+			'Embed
+		- @model_list.each do |model, attributes|
+			tr
+				td = model
+				td = attributes.join('<br>')
+				td = @embed_list[model].join('<br>')
+h3 Accessible params
+table
+	tr
+		td
+			'limit - set limit (for example limit=10)
+			'offset - set offset (for example offset=10)
+			'order - comma separated order (for example order=id, order=-created_at)
+			'q - search query (for example q=google)
+			'fields - comma separated fields for answer
+			'embed - comma separated embed. If name of embed include dot (.) this is field for embed
+			'%field% - where query (for example nickname=t0pep0)
+			
+h3
+	'Route list
+table
+	tr
+		td
+			'HTTP request type
+		td
+			'Request path
+		td
+			'Params
+		td
+			'Description
+	tr
+		td
+			'GET
+		td = "api/documentation/#{@major}"
+		td
+			'This documentation
+	tr
+		td
+			'GET
+		td = "api/#{@major}/:model/:record_id/:edge"
+		td
+			'List edge of model
+	tr
+		td
+			'POST
+		td = "api/#{@major}/:model/:record_id/:edge"
+		td
+			'Create new edge of model
+	tr
+		td
+			'GET
+		td = "api/#{@major}/:model"
+		td
+			'List model
+	tr
+		td
+			'POST
+		td = "api/#{@major}/:model"
+		td
+			'Create record in model
+	tr
+		td
+			'GET
+		td = "api/#{@major}/:model/:record_id"
+		td
+			'Get record from model
+	tr
+		td
+			'PUT
+		td = "api/#{@major}/:model/:record_id"
+		td
+			'Update attributes in record from model
+	tr
+		td
+			'DELETE
+		td = "api/#{@major}/:model/:record_id"
+		td
+			'Delete record from model
+h3
+	'Full request list
+table
+	tr 
+		td
+			'HTTP request type
+		td
+			'Request path
+	- for route in @routes
+		tr
+			td = route[:request_type]
+			td = route[:request_path]
+	

@@ -71,10 +71,38 @@ class ApiController < RestFullApi::Api
   end
 
 
-  def description
-    @answer = @version_config[:options][:description]
-    render_answer(@answer, 200)
-  end
+	def description
+    @routes = []
+		@model_list = @version_config[:options][:attributes_accessible]
+		@embed_list = @version_config[:options][:embed_accessible]
+		@model_list.each do |model, attributes|
+			route = {}
+			@embed_list[model].each do |embed|
+				route[:request_type] = "GET"
+				route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{embed}"
+				@routes.push(route)
+				route[:request_type] = "POST"
+				route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{embed}"
+				@routes.push(route)
+			end
+			route[:request_type] = "GET"
+			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}"
+			@routes.push(route)
+			route[:request_type] = "POST"
+			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}"
+			@routes.push(route)
+			route[:request_type] = "GET"
+			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{model.classify.constantize.first.id}"
+			@routes.push(route)
+			route[:request_type] = "PUT"
+			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{model.classify.constantize.first.id}"
+			@routes.push(route)
+			route[:request_type] = "POST"
+			route[:request_path] = "api/#{@major}/#{model.classify.constantize.table_name}/#{model.classify.constantize.first.id}"
+			@routes.push(route)
+
+		end
+	end
 	
 	def run_methods
 		meth = params[:method]
