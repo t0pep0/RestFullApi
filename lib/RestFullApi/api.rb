@@ -15,7 +15,7 @@ class RestFullApi::Api < ActionController::Base
   end
  
 	before_filter :before 
-	before_filter :before_db, :except => :run_methods
+	before_filter :before_db, :except => [:run_methods, :description]
 
   private
   
