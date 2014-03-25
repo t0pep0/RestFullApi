@@ -92,13 +92,13 @@ class ApiController < RestFullApi::Api
 			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}"
 			@routes.push(route)
 			route[:request_type] = "GET"
-			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{model.classify.constantize.first.id}"
+			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{model.to_s.constantize.first.id}"
 			@routes.push(route)
 			route[:request_type] = "PUT"
-			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{model.classify.constantize.first.id}"
+			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{model.to_s.constantize.first.id}"
 			@routes.push(route)
 			route[:request_type] = "POST"
-			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{model.classify.constantize.first.id}"
+			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{model.to_s.constantize.first.id}"
 			@routes.push(route)
 
 		end
