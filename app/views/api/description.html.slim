@@ -19,7 +19,7 @@ table
 			'Internal code
 		td
 			'Error message
-	- @version_config[:error] do |error, values|
+	- @version_config[:error].each do |error, values|
 		tr
 			td = values[:http_code]
 			td = values[:code]
