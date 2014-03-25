@@ -76,29 +76,35 @@ class ApiController < RestFullApi::Api
 		@model_list = @version_config[:options][:attributes_accessible]
 		@embed_list = @version_config[:options][:embed_accessible]
 		@model_list.each do |model, attributes|
-			route = {}
 			unless @embed_list[model].nil?
 				@embed_list[model].each do |embed|
+					route = {}
 					route[:request_type] = "GET"
 					route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{embed}"
 					@routes.push(route)
+					route = {}
 					route[:request_type] = "POST"
 					route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/#{embed}"
 					@routes.push(route)
 				end
 			end
+			route = {}
 			route[:request_type] = "GET"
 			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}"
 			@routes.push(route)
+			route = {}
 			route[:request_type] = "POST"
 			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}"
 			@routes.push(route)
+			route = {}
 			route[:request_type] = "GET"
 			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/1"
 			@routes.push(route)
+			route = {}
 			route[:request_type] = "PUT"
 			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/1"
 			@routes.push(route)
+			route = {}
 			route[:request_type] = "POST"
 			route[:request_path] = "api/#{@major}/#{model.to_s.constantize.table_name}/1"
 			@routes.push(route)
