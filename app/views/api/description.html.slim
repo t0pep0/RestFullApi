@@ -40,7 +40,9 @@ table
 				td
 					unless attributes.nil? 
 						= attributes.join('<br>')
-				td = @embed_list[model].join('<br>')
+				td 
+					unless @embed_list[model].nil?
+						= @embed_list[model].join('<br>')
 h3 Accessible params
 table
 	tr
