@@ -1,4 +1,4 @@
-h3 
+h3
 	'Basic settings
 table
 	tr
@@ -13,11 +13,11 @@ h3
 	'Errors list
 table
 	tr
-		td
+		th
 			'HTTP code
-		td
+		th
 			'Internal code
-		td
+		th
 			'Error message
 	- @version_config[:error].each do |error, values|
 		tr
@@ -28,11 +28,11 @@ h3
 	'Model, Attributes and Embed list
 table
 	tr
-		td
+		th
 			'Model
-		td
+		th
 			'Attributes
-		td
+		th
 			'Embed
 		- @model_list.each do |model, attributes|
 			tr
@@ -44,7 +44,7 @@ table
 							br
 				td 
 					- unless @embed_list[model].nil?
-						= @embed_list[model].each do |embed|
+						- @embed_list[model].each do |embed|
 							= embed
 							br
 h3 Accessible params
@@ -103,13 +103,13 @@ h3
 	'Route list
 table
 	tr
-		td
+		th
 			'HTTP request type
-		td
+		th
 			'Request path
-		td
+		th
 			'Params
-		td
+		th
 			'Description
 	tr
 		td
@@ -163,9 +163,9 @@ h3
 	'Full request list
 table
 	tr 
-		td
+		th
 			'HTTP request type
-		td
+		th
 			'Request path
 	- for route in @routes
 		tr
