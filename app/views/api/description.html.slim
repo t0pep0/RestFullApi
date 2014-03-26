@@ -39,10 +39,14 @@ table
 				td = model
 				td
 					- unless attributes.nil? 
-						= attributes.join(' ')
+						- attributes.each do |attr|
+							= attr
+							br
 				td 
 					- unless @embed_list[model].nil?
-						= @embed_list[model].join(' ')
+						= @embed_list[model].each do |embed|
+							= embed
+							br
 h3 Accessible params
 table
 	tr
@@ -66,7 +70,35 @@ table
 	tr
 		td
 			'%field% - where query (for example nickname=t0pep0)
-			
+
+h3
+	'Request HTTP headers
+table
+	tr
+		td
+			= @version_config[:headers][:minor_version]
+	tr
+		td
+			= @version_config[:headers][:api_key]
+
+h3
+	'Answer HTTP headers
+table
+	tr
+		td
+			= @version_config[:headers][:count]
+	tr
+		td
+			= @version_config[:headers][:created_at]
+	tr
+		td
+			= @version_config[:headers][:limit]
+	tr
+		td
+			= @version_config[:headers][:offset]
+
+					
+
 h3
 	'Route list
 table
