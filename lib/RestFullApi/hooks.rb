@@ -3,12 +3,12 @@ module RestFullApi
 
     def self.init
       begin
-       	require 'mongoid'
-	rescue LoadError 
-	  nil
+         require 'mongoid'
+  rescue LoadError 
+    nil
       end
       if defined? ::Mongoid
-	require 'RestFullApi/mongoid_restfullapi'
+  require 'RestFullApi/mongoid_restfullapi'
       end
     end
 

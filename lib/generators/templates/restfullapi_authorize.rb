@@ -1,5 +1,5 @@
 class <<RestFullApi
-			def authorize?(login, pass)
-				true
-			end
+      def authorize?(login, pass)
+        true
+      end
 end

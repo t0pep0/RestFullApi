@@ -2,7 +2,7 @@ class RestFullApi::Api < ActionController::Base
 
   def search(model, query, where, sort, offset, limit)
     #NOTICE: This function write for "thinking sphinx, if your use another search engine override it
-		@records = @model.search(query.split(' ').map{|i| "*#{i}*"}.join(' '), conditions: where, order: sort, offset: offset, limit: limit)
+    @records = @model.search(query.split(' ').map{|i| "*#{i}*"}.join(' '), conditions: where, order: sort, offset: offset, limit: limit)
     @total_count = @records.total_entries
   end
 
@@ -14,8 +14,8 @@ class RestFullApi::Api < ActionController::Base
     true #NOTICE: For overriding
   end
  
-	before_filter :before 
-	before_filter :before_db, :except => [:run_methods, :description]
+  before_filter :before 
+  before_filter :before_db, :except => [:run_methods, :description]
 
   private
   
@@ -42,43 +42,43 @@ class RestFullApi::Api < ActionController::Base
   end
 
   def before
-		@default_config = RestFullApi.configuration.default
-		read_pretty
+    @default_config = RestFullApi.configuration.default
+    read_pretty
     read_major
     read_minor
-		User.current = current_user rescue false #Dirty hack
+    User.current = current_user rescue false #Dirty hack
     unless (RestFullApi.configuration.version_map[@major].include?(@minor) rescue false)
       json =  {error: {code: 0, description: RestFullApi.configuration.unknown_api_version}}
       if @pretty
         json = JSON.pretty_generate(json)
       end
       render json: json, status: 400
-		else
-			@version_config = RestFullApi.configuration.version_option[@major][@minor]
+    else
+      @version_config = RestFullApi.configuration.version_option[@major][@minor]
     end
     read_api_key
     check_api_key
     authencticate
   end
 
-	def before_db
+  def before_db
     get_model
     read_fields
     read_embeds
-	end
+  end
 
   def read_pretty
-		@pretty = (params[:pretty] == 'true' or params[:pretty].present?) rescue false
+    @pretty = (params[:pretty] == 'true' or params[:pretty].present?) rescue false
   end
 
   def read_major
-		@major = (params[:major].to_i rescue @default_config[:values][:major_version].to_i)
+    @major = (params[:major].to_i rescue @default_config[:values][:major_version].to_i)
   end
 
   def read_minor
     if defined? request
       if defined? request.headers
-				@minor = (request.headers[@default_config[:headers][:minor_version]].present? ? request.headers[@default_config[:headers][:minor_version]].to_i : @default_config[:values][:minor_version].to_i rescue @default_config[:values][:minor_version].to_i)
+        @minor = (request.headers[@default_config[:headers][:minor_version]].present? ? request.headers[@default_config[:headers][:minor_version]].to_i : @default_config[:values][:minor_version].to_i rescue @default_config[:values][:minor_version].to_i)
       else
         create_error(:no_headers) #IMPOSIBLE!
       end
@@ -105,10 +105,10 @@ class RestFullApi::Api < ActionController::Base
     if @version_config[:options][:authorize]
       authenticate_or_request_with_http_basic do |login, pass|
         if authorize?(login, pass)
-					return true
-				else
-					create_error(:not_authorize)
-				end
+          return true
+        else
+          create_error(:not_authorize)
+        end
       end 
     end
   end
@@ -173,53 +173,53 @@ class RestFullApi::Api < ActionController::Base
     operators = {">=" => "gte", "<=" => "lte", "<" => "lt", ">" => "gt", "!=" => "ne"}
     @requested_where = []
     @requested_mongo_where = {}
-		@requested_sphinx_where = {}
+    @requested_sphinx_where = {}
     @api_attr_accessible.each do |attr|
       if (params[attr].present? rescue false)
         complete = false
           operators.each do |string, ident|
             if (params[attr][string] rescue false)
-	      @requested_where.push("#{@model.table_name}.#{attr} #{string} '#{params[attr].delete(string)}'")
-	      @requested_mongo_where.merge!({"#{attr}.#{ident}".to_sym => params[attr].delete(string)})
+        @requested_where.push("#{@model.table_name}.#{attr} #{string} '#{params[attr].delete(string)}'")
+        @requested_mongo_where.merge!({"#{attr}.#{ident}".to_sym => params[attr].delete(string)})
               complete = true
             end
             break if (params[attr][string] rescue true)
           end
           unless complete
-	    if params[attr] == 'nil'
-	      value = 'NULL'
-	      mongo_value = nil
-	    else
-	      value = params[attr]
-	      mongo_value = params[attr]
-	    end
-	    @requested_where.push("`#{@model.table_name}.#{attr}` = '#{value}'")
-	    @requested_mongo_where.merge!(attr.to_sym => mongo_value)
-			@requested_sphinx_where.merge!(attr.to_sym => mongo_value)
+      if params[attr] == 'nil'
+        value = 'NULL'
+        mongo_value = nil
+      else
+        value = params[attr]
+        mongo_value = params[attr]
+      end
+      @requested_where.push("`#{@model.table_name}.#{attr}` = '#{value}'")
+      @requested_mongo_where.merge!(attr.to_sym => mongo_value)
+      @requested_sphinx_where.merge!(attr.to_sym => mongo_value)
           end
       end
     end
         @requested_where = @requested_where.join(', ')
 
       @requested_sort = {}
-			@requested_search_sort = []
+      @requested_search_sort = []
       if (params[:sort].present? rescue false)
         params['sort'].split(',').each do |sort|
-	  if sort['-']
-			@requested_sort.merge!("#{@model.table_name}.#{sort.delete('-')}".to_sym => :desc) if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
-			@requested_search_sort.push("#{sort.delete('-')} DESC") if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
-	  else
-	  end
-			@requested_sort.merge!("#{@model.table_name}.#{sort}".to_sym => :asc) if (@api_attr_accessible.include?(sort.to_sym) rescue false)
-			@requested_search_sort.push("#{sort} ASC") if (@api_attr_accessible.include?(sort.to_sym) rescue false)
+    if sort['-']
+      @requested_sort.merge!("#{@model.table_name}.#{sort.delete('-')}".to_sym => :desc) if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
+      @requested_search_sort.push("#{sort.delete('-')} DESC") if (@api_attr_accessible.include?(sort.delete('-').to_sym) rescue false)
+    else
+    end
+      @requested_sort.merge!("#{@model.table_name}.#{sort}".to_sym => :asc) if (@api_attr_accessible.include?(sort.to_sym) rescue false)
+      @requested_search_sort.push("#{sort} ASC") if (@api_attr_accessible.include?(sort.to_sym) rescue false)
         end
       end
-			@requested_search_sort = @requested_search_sort.join(',')
+      @requested_search_sort = @requested_search_sort.join(',')
   end
 
   #get record from model 
   def get_record(record, fields, embeds)
-		record_class = (record.new.class.model_name.to_sym rescue record.class.model_name.to_sym)
+    record_class = (record.new.class.model_name.to_sym rescue record.class.model_name.to_sym)
     result = {}
     record_attr = @version_config[:options][:attributes_accessible][record_class]
     record_embed = @version_config[:options][:embed_accessible][record_class]
@@ -229,43 +229,43 @@ class RestFullApi::Api < ActionController::Base
       end
     end
     embeds.each do |embed, subembed|
-			if record_embed.include? embed.to_sym
+      if record_embed.include? embed.to_sym
         result[embed] = []
         embed_obj = record.send(embed)
-				embed_model = (embed_obj.instance_of?(Array) ? embed_obj.new.class.model_name.to_s : embed_obj.class.model_name.to_s)
-	embed_obj_attr = @version_config[:options][:attributes_accessible][embed_model.to_sym]
+        embed_model = (embed_obj.instance_of?(Array) ? embed_obj.new.class.model_name.to_s : embed_obj.class.model_name.to_s)
+  embed_obj_attr = @version_config[:options][:attributes_accessible][embed_model.to_sym]
         subembed = embed_obj_attr if subembed == [nil]
-				unless (embed_obj.class.nil?)
-					if (embed_obj.class == Array)
-						unless embed_obj.count == 0
-							arr = []
-							embed_obj.each do |obj|
-								hash = {}
-								subembed.each do |sub|
-									if (embed_obj_attr.include?(sub.to_sym) rescue false)
-										hash[sub] = (obj.send(sub) rescue nil)
-									end
-								end
-								arr.push(hash)
-							end
-							result.merge!({embed => arr})
-						else
-							result.merge!({embed => nil})
-						end
-					else
-						hash = {}
-						subembed.each do |sub|
-							if (embed_obj_attr.include?(sub.to_sym) rescue false)
-								hash[sub] = (embed_obj.send(sub) rescue nil)
-							end
-						end
-						result.merge!({embed => hash})
-					end
-				else
-					result.merge!({embed => nil})
-				end
-			end
-		end
+        unless (embed_obj.class.nil?)
+          if (embed_obj.class == Array)
+            unless embed_obj.count == 0
+              arr = []
+              embed_obj.each do |obj|
+                hash = {}
+                subembed.each do |sub|
+                  if (embed_obj_attr.include?(sub.to_sym) rescue false)
+                    hash[sub] = (obj.send(sub) rescue nil)
+                  end
+                end
+                arr.push(hash)
+              end
+              result.merge!({embed => arr})
+            else
+              result.merge!({embed => nil})
+            end
+          else
+            hash = {}
+            subembed.each do |sub|
+              if (embed_obj_attr.include?(sub.to_sym) rescue false)
+                hash[sub] = (embed_obj.send(sub) rescue nil)
+              end
+            end
+            result.merge!({embed => hash})
+          end
+        else
+          result.merge!({embed => nil})
+        end
+      end
+    end
     return result
   end
 
